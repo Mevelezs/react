@@ -1,33 +1,144 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import './App.css'
+import { useState } from "react";
+import confetti from 'canvas-confetti'
+const TURNS = {
+  X: 'X',
+  O: 'O'
+};
+
+const WINNER_COMBOS = [
+  [0, 1, 2],
+  [3, 4, 5],
+  [6, 7, 8],
+  [0, 3, 6],
+  [1, 4, 7],
+  [2, 5, 8],
+  [0, 4, 8],
+  [2, 4, 6],
+];
+
+const Square = ({ children, updateBoard, isSelected, index }) => {
+  const className = `square ${isSelected ? 'is-selected' : ''}`;
+
+  const hadleClick = () => {
+    updateBoard(index) // pasmos el indice
+  };
+  return (
+    <div onClick={hadleClick} className={className} >
+      {children}
+    </div>
+  )
+};
+
 
 function App() {
-  const [count, setCount] = useState(0)
 
+  const [board, setBoard] = useState(Array(9).fill(null));
+  const [turn, setTurn] = useState(TURNS.X);
+  const [winner, setWinner] = useState(null);
+
+  const checkWinner = (boardToCheck /*tablero completo*/) => {
+    for (const combos of WINNER_COMBOS) {
+      const [a, b, c] = combos // destructurin
+      if (
+        boardToCheck[a] &&
+        boardToCheck[a] === boardToCheck[b] &&
+        boardToCheck[a] === boardToCheck[c]
+      ) {
+        return boardToCheck[a];
+      }
+    }
+    return null;
+  }
+
+  const checkEndGame = (newBoard) => {
+    // revisamos si hay empate
+    //si no hay más espacios vacíos en el tablero
+
+    return newBoard.every((square) => square !== null);
+  }
+
+  const updateBoard = (index) => {
+    //no se actualiza esta posición.
+    if (board[index] || winner) return;
+    // actualizar el tablero
+    const newBoard = [...board]; // copiamos el board, para no mutar el estado directamente (tampoco se deberían mutar las props directamente)
+    newBoard[index] = turn // se guarda el turno en el board en la posicion del indice en la copia.
+    setBoard(newBoard); // cambiamos el board con lo antarior
+
+    // cambiar le turno
+    const newTurn = turn === TURNS.X ? TURNS.O : TURNS.X;
+    setTurn(newTurn);
+
+    // revisar ganador
+    const newWinner = checkWinner(newBoard);
+    if (newWinner) {
+      confetti()
+      setWinner(newWinner)
+    }else if(checkEndGame(newBoard)){
+      setWinner(false);
+    }
+  }
+
+  const resetGame = () => {
+    setBoard(Array(9).fill(null));
+    setTurn(TURNS.X);
+    setWinner(null);
+  }
   return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </div>
+    <main className="board">
+      <h1 className="tic-tac-toe">Tic tac toe</h1>
+      <button onClick={resetGame}>Restart</button>
+      <section className="game">
+        {
+          board.map((e, index) => {
+            return (
+              <Square
+                key={index}
+                index={index} // indice del arreglo
+                updateBoard={updateBoard}
+              >
+                {e}
+              </Square>
+            )
+          })
+        }
+      </section>
+
+      <section className="turn">
+        <Square isSelected={turn === TURNS.X}>
+          {TURNS.X}
+        </Square>
+        <Square isSelected={turn === TURNS.O}>
+          {TURNS.O}
+        </Square>
+      </section>
+
+
+      {
+        winner !== null && (
+          <section className="winner">
+            <div className="text">
+              <h2>
+                {
+                  winner === false ? 'Empate' : 'Ganó'
+                }
+              </h2>
+              <header className="win">
+                {
+                  winner &&
+                  <Square>
+                    {winner}
+                  </Square>
+                }
+              </header>
+              <footer>
+                <button onClick = { resetGame }>Restart</button>
+              </footer>
+            </div>
+          </section>
+        )
+      }
+    </main>
   )
 }
 
