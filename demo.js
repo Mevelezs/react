@@ -1,11 +1,12 @@
 const array = Array(9).fill(null)
 
-array.map((e, index, arr)=> {
-    console.log(e, index, arr)
+// eslint-disable-next-line array-callback-return
+array.map((e, index, arr) => {
+  console.log(e, index, arr)
 })
 
 console.log(array)
 
-// cpmparacio de arrays
+// comparacion de arrays
 
 console.log(array.every(e => e === null))
