@@ -9,4 +9,4 @@ console.log(array)
 
 // comparacion de arrays
 
-console.log(array.every(e => e === null))
+//console.log(array.every(e => e === null))
