@@ -1,6 +1,6 @@
 import withoutResults from '../mocks/no-results.json'
 
-export function WitoutResults () {
+export function WithoutResults () {
   return (
     <>
       <p>

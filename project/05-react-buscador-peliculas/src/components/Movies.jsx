@@ -1,5 +1,5 @@
-import { WitoutResults } from './WithoutMovies'
-import { ListofMovies } from './ListofMuvies'
+import { WithoutResults } from './WithoutMovies'
+import { ListofMovies } from './ListofMovies'
 
 export function Movies ({ movies }) {
   const hasMovies = movies?.length > 0
@@ -8,7 +8,7 @@ export function Movies ({ movies }) {
       {
         hasMovies
           ? <ListofMovies movies={movies} />
-          : <WitoutResults />
+          : <WithoutResults />
       }
     </>
   )

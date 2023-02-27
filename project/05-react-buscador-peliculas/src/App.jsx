@@ -1,55 +1,56 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import './App.css'
-import Demo from './components/demo/Demo'
 import { Movies } from './components/Movies'
 import { useMovies } from './hooks/useMovie'
+import { useSearch } from './hooks/useSearch'
 
 function App () {
-  const { movies } = useMovies()
-  const [query, setQuery] = useState('')
-  const [error, setError] = useState(null)
-
-  const handleonChange = (e) => {
-    const newQuery = e.target.value
-    if (newQuery.startsWith(' ')) return
-    setQuery(newQuery)
+  const [sort, setSort] = useState(false)
+  const { movies, getMovies, loading } = useMovies({ sort })
+  const { search, error, handleonChange, handleSubmit } = useSearch({ getMovies })
+  const handleSort = () => {
+    setSort(!sort)
   }
 
-  useEffect(() => {
-    if (query === '') {
-      setError('No se puede mostrar una pelicula vacia')
-      return
-    } else if (query.length < 3) {
-      setError('Minimo tres Caracteres')
-      return
-    }
-    setError(null)
-  }, [query])
   return (
-    <>
+    <div className='page'>
       <header>
         <h1> Movie Search  Engine</h1>
-        <form className='form'>
-          <input
-            type='text'
-            placeholder='Matrix, Avengers, Star Wars...'
-            onChange={handleonChange}
-            name='query'
-            value={query}
-            style={{
-              border: '1px solid transparent',
-              borderColor: error ? 'red' : 'transparent'
-            }}
-          />
-          <button type='submit'>Search</button>
+        <form className='form' onSubmit={handleSubmit}>
+          <div>
+            <input
+              type='text'
+              placeholder='Matrix, Avengers, Star Wars...'
+              onChange={handleonChange}
+              name='query'
+              value={search}
+              style={{
+                border: '1px solid transparent',
+                borderColor: error ? 'red' : 'transparent'
+              }}
+            />
+            {
+              search && search.length > 2
+                ? (
+                  <input type='checkbox' className='sort' checked={sort} onChange={handleSort} />)
+                : (<input type='checkbox' className='sort' disabled checked={sort} onChange={handleSort} />)
+            }
+            <button type='submit'>Search</button>
+          </div>
+          <div>
+            {
+              error && error.length > 3 ? <p style={{ color: 'red' }}>{error}</p> : null
+            }
+          </div>
         </form>
       </header>
 
       <main>
-        <Movies movies={movies} />
+        {
+          loading ? <p>Cargando...</p> : <Movies movies={movies} />
+        }
       </main>
-      {/* <Demo /> */}
-    </>
+    </div>
   )
 }
 
