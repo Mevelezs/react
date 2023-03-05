@@ -1,28 +1,19 @@
-/* eslint-disable no-unused-expressions */
-import { useState } from 'react'
-import { products } from '../src/mooks/products.json'
 import { Header } from './components/header/Header'
 import { Products } from './components/products/Products'
+import { useFilter } from './components/hooks/filterProducts'
+import { Cart } from './components/cart/Cart'
+import { CartPovider } from './context/cart'
 
 function App () {
-  const [filters, setFilterProducts] = useState({
-    category: 'all',
-    myprice: 0
-  })
+  const { filteredProducts } = useFilter()
 
-  const filterProducts = (products) => {
-    const productFiltered = products.filter((product) => {
-      return product.price >= filters.myprice && (
-        filters.category === 'all' ||
-        product.category === filters.category
-      )
-    })
-    return productFiltered
-  }
   return (
     <div className='mainContainer'>
-      <Header />
-      <Products products={filterProducts(products)} />
+      <CartPovider>
+        <Header />
+        <Cart />
+        <Products products={filteredProducts} />
+      </CartPovider>
     </div>
   )
 }

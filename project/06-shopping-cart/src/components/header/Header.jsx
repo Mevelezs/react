@@ -3,8 +3,9 @@ import { Filter } from '../filter/Filter'
 
 export function Header () {
   return (
-    <div>
+    <header>
+      <h1>Shopping Cart 🛒</h1>
       <Filter />
-    </div>
+    </header>
   )
 }
