@@ -106,7 +106,9 @@
 .cart-button:hover {
   scale: 1.1;
 }
-
+.input-checkbox {
+  visibility: hidden;
+}
 .cart-button~input:checked~.cart {
   height: 100%;
   display: block;
