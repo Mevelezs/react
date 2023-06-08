@@ -1,25 +1,32 @@
 import { Button, Card, Text, TextInput } from '@tremor/react';
-import { useState } from 'react';
+import { ChangeEvent, SyntheticEvent, useState } from 'react';
+import { User } from '../../store/users/slice';
+import { useUserActions } from '../hooks/useUserActions';
 
 export default function CreateUser() {
-  const [user, setUser] = useState({
-    username: '',
+  const [newUser, setNewUser] = useState<User>({
+    name: '',
     email: '',
     github: '',
   });
 
-  const handleonChange = (e) => {
+  const { addNewUser } = useUserActions();
+
+  const handleonChange = (e: ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
-    setUser((prev) => {
-      return {
-        ...prev,
-        [e.target.name]: e.target.value,
-      };
-    });
+    setNewUser((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: SyntheticEvent) => {
     e.preventDefault();
-    console.log(user);
+    addNewUser(newUser);
+    setNewUser({
+      name: '',
+      email: '',
+      github: '',
+    });
   };
 
   return (
@@ -43,20 +50,20 @@ export default function CreateUser() {
         onSubmit={handleSubmit}
       >
         <TextInput
-          name='username'
-          value={user.username}
+          name='name'
+          value={newUser.name}
           onChange={handleonChange}
           placeholder='Name...'
         />
         <TextInput
           name='email'
-          value={user.email}
+          value={newUser.email}
           onChange={handleonChange}
           placeholder='mail@mail.com'
         />
         <TextInput
           name='github'
-          value={user.github}
+          value={newUser.github}
           onChange={handleonChange}
           placeholder='github'
         />
