@@ -1,32 +1,50 @@
 import { type Users } from '../types';
 
 interface Props {
-  users: Users[];
+  sorted: Users[];
+  showColors: boolean;
 }
-export function ListOfUsers({ users }: Props) {
+export function ListOfUsers({ sorted, showColors }: Props) {
+  const selectColors = (index: number) => {
+    return index % 2 === 0 ? '#333' : '#555';
+  };
+
   return (
-    <table style={{width:'100%', margin:'0'}}>
-      <thead>
-        <th>Foto</th>
-        <th>Nombre</th>
-        <th>País</th>
-        <th>Acciones</th>
-      </thead>
-      <tbody>
-        {users.map((user) => (
-          <tr key={user.id.value}>
-            <td>
-              <img src={user.picture.thumbnail} alt={user.name.first} />
-            </td>
-            <td>{user.name.first}</td>
-            <td>{user.name.last}</td>
-            <td>
-              <button>Eliminar</button>
-            </td>
+    <main>
+      <table style={{ width: '100%', margin: '0' }}>
+        <thead>
+          <tr>
+            <th>Photo</th>
+            <th>Name</th>
+            <th>LastName</th>
+            <th>Country</th>
+            <th>Actions</th>
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {sorted.map((user, index) => (
+            <tr
+              key={user.email}
+              style={{
+                backgroundColor: showColors
+                  ? selectColors(index)
+                  : 'transparent',
+              }}
+            >
+              <td>
+                <img src={user.picture.thumbnail} alt={user.name.first} />
+              </td>
+              <td>{user.name.first}</td>
+              <td>{user.name.last}</td>
+              <td>{user.location.country}</td>
+              <td>
+                <button>Eliminar</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </main>
   );
 }
 
