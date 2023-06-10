@@ -3,8 +3,9 @@ import { type Users } from '../types';
 interface Props {
   sorted: Users[];
   showColors: boolean;
+  handleDelete: (email: string) => void;
 }
-export function ListOfUsers({ sorted, showColors }: Props) {
+export function ListOfUsers({ sorted, showColors, handleDelete }: Props) {
   const selectColors = (index: number) => {
     return index % 2 === 0 ? '#333' : '#555';
   };
@@ -38,7 +39,7 @@ export function ListOfUsers({ sorted, showColors }: Props) {
               <td>{user.name.last}</td>
               <td>{user.location.country}</td>
               <td>
-                <button>Eliminar</button>
+                <button onClick={() => handleDelete(user.email)}>Eliminar</button>
               </td>
             </tr>
           ))}

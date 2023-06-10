@@ -28,11 +28,21 @@ function App() {
       })
     : users;
 
+  const handleDelete = (mail: string ) => {
+    const newUsers = users.filter((user) => user.email != mail);
+    setUsers(newUsers);
+  }
+
+  
   return (
     <>
       <h1>Prueba Tecnica</h1>
       <UserActions togglePaint={togglePaint} sortByCountry={sortByCountry} />
-      <ListOfUsers sorted={sorted} showColors={showColors} />
+      <ListOfUsers
+        sorted={sorted}
+        showColors={showColors}
+        handleDelete={handleDelete}
+      />
     </>
   );
 }
