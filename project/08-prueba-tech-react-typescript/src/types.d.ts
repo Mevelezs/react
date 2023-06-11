@@ -80,7 +80,12 @@ export interface Name {
   first: string;
   last: string;
 }
-
+export enum SortBy {
+  NONE='none',
+  NAME = 'name',
+  LASTN = 'last',
+  COUNTRY='country'
+}
 export enum Title {
   MS = 'Ms',
   Madame = 'Madame',

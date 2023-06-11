@@ -1,11 +1,17 @@
-import { type Users } from '../types';
+import { SortBy, type Users } from '../types.d';
 
 interface Props {
-  sorted: Users[];
+  sorted: Users[] | undefined;
   showColors: boolean;
   handleDelete: (email: string) => void;
+  handleOrganisator: (data: SortBy) => void;
 }
-export function ListOfUsers({ sorted, showColors, handleDelete }: Props) {
+export function ListOfUsers({
+  sorted,
+  showColors,
+  handleDelete,
+  handleOrganisator,
+}: Props) {
   const selectColors = (index: number) => {
     return index % 2 === 0 ? '#333' : '#555';
   };
@@ -16,14 +22,14 @@ export function ListOfUsers({ sorted, showColors, handleDelete }: Props) {
         <thead>
           <tr>
             <th>Photo</th>
-            <th>Name</th>
-            <th>LastName</th>
-            <th>Country</th>
+            <th className='sort' onClick={() => { handleOrganisator(SortBy.NAME) }}>Name</th>
+            <th className='sort' onClick={()=> {handleOrganisator(SortBy.LASTN)}}>LastName</th>
+            <th className='sort' onClick={() => {handleOrganisator(SortBy.COUNTRY)}}>Country</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {sorted.map((user, index) => (
+          {sorted?.map((user, index) => (
             <tr
               key={user.email}
               style={{
@@ -39,7 +45,7 @@ export function ListOfUsers({ sorted, showColors, handleDelete }: Props) {
               <td>{user.name.last}</td>
               <td>{user.location.country}</td>
               <td>
-                <button onClick={() => handleDelete(user.email)}>Eliminar</button>
+                <button onClick={() => handleDelete(user.email)}>Delete</button>
               </td>
             </tr>
           ))}
