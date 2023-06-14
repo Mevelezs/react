@@ -11,7 +11,9 @@ export function ListOfUsers({
   showColors,
   handleDelete,
   handleOrganisator,
-}: Props) {
+
+}
+  : Props) {
   const selectColors = (index: number) => {
     return index % 2 === 0 ? '#333' : '#555';
   };
@@ -22,9 +24,30 @@ export function ListOfUsers({
         <thead>
           <tr>
             <th>Photo</th>
-            <th className='sort' onClick={() => { handleOrganisator(SortBy.NAME) }}>Name</th>
-            <th className='sort' onClick={()=> {handleOrganisator(SortBy.LASTN)}}>LastName</th>
-            <th className='sort' onClick={() => {handleOrganisator(SortBy.COUNTRY)}}>Country</th>
+            <th
+              className='sort'
+              onClick={() => {
+                handleOrganisator(SortBy.NAME);
+              }}
+            >
+              Name
+            </th>
+            <th
+              className='sort'
+              onClick={() => {
+                handleOrganisator(SortBy.LASTN);
+              }}
+            >
+              LastName
+            </th>
+            <th
+              className='sort'
+              onClick={() => {
+                handleOrganisator(SortBy.COUNTRY);
+              }}
+            >
+              Country
+            </th>
             <th>Actions</th>
           </tr>
         </thead>

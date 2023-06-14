@@ -12,7 +12,7 @@ function App() {
   const [filterCountry, setFilteCountry] = useState<string | null>(null);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
-
+  const [currentPage, setCurrentPage] = useState(1);
 
   const sortByCountry = () => {
     const newSorted =
@@ -22,20 +22,34 @@ function App() {
 
   useEffect(() => {
     setLoading(true);
-    fetch('https://randomuser.me/api/?results=100')
-      .then((res) => res.json())
-      .then((data) => {
-        setUsers(data.results);
-        originalUsers.current = data.results;
+    setError(false);
+    fetch(
+      `https://randomuser.me/api/?results=3&seed=Mauricio&page=${currentPage}`
+    ) // seed : semillas revisar doc de la api
+      .then((res) => {
+        console.log(res.ok, res.status, res.statusText);
+
+        if (!res.ok) throw new Error('error de la petición'); // validación correcta (cons axios no es necesario el catch getiona esta linea por debajo)
+        return res.json();
       })
-      .catch((error) =>{
+      .then((data) => {
+        setUsers((prev) => {
+          console.log(prev);
+          const newUsers = prev.concat(data.results);
+          originalUsers.current = newUsers;
+          return newUsers;
+        });
+      })
+      .catch((error) => {
+        // aqui se valida si el fetch no responde por conección
         setError(true);
-        console.log(error); 
+        setLoading(false);
+        console.log(error);
       })
       .finally(() => {
-      setLoading(false);
-      })
-  }, []);
+        setLoading(false);
+      });
+  }, [currentPage]);
 
   const togglePaint = () => {
     setShowColors(!showColors);
@@ -79,6 +93,7 @@ function App() {
   const handleOrganisator = (data: SortBy) => {
     setSortedByCountry(data);
   };
+
   return (
     <>
       <h1>Prueba Tecnica</h1>
@@ -89,15 +104,25 @@ function App() {
         setFilteCountry={setFilteCountry}
         sortedByCountry={sortedByCountry}
       />
-      {
-        !loading && ! error ?
-        <ListOfUsers
-        sorted={sorted}
-        showColors={showColors}
-        handleDelete={handleDelete}
-        handleOrganisator={handleOrganisator}
-        /> : <h3>Cargando...</h3>
-      }
+
+      {users.length > 0 && (
+        <>
+          <ListOfUsers
+            sorted={sorted}
+            showColors={showColors}
+            handleDelete={handleDelete}
+            handleOrganisator={handleOrganisator}
+          />
+          {!loading && (
+            <button onClick={() => setCurrentPage(currentPage + 1)}>
+              Charge more users
+            </button>
+          )}
+        </>
+      )}
+      {loading && <h3>Laoding...</h3>}
+      {!loading && error && <h3>the request has an error</h3>}
+      {!loading && !error && users.length === 0 && <h3>No users</h3>}
     </>
   );
 }
