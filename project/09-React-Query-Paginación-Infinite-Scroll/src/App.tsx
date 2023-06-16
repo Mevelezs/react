@@ -1,55 +1,22 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { SortBy, type Users } from '../src/types.d';
 import './App.css';
 import { ListOfUsers } from './components/ListOfUsers.tsx';
 import { UserActions } from './components/UserActions.tsx';
+import { useUsers } from './hooks/useUsers.ts';
 
 function App() {
-  const [users, setUsers] = useState<Users[]>([]);
+  const { isLoading, isError, users, refetch, hasNextPage, fetchNextPage } = useUsers();
+
   const [showColors, setShowColors] = useState(false);
   const [sortedByCountry, setSortedByCountry] = useState(SortBy.NONE);
-  const originalUsers = useRef<Users[]>([]);
   const [filterCountry, setFilteCountry] = useState<string | null>(null);
-  const [error, setError] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
 
   const sortByCountry = () => {
     const newSorted =
       sortedByCountry === SortBy.NONE ? SortBy.COUNTRY : SortBy.NONE;
     setSortedByCountry(newSorted);
   };
-
-  useEffect(() => {
-    setLoading(true);
-    setError(false);
-    fetch(
-      `https://randomuser.me/api/?results=3&seed=Mauricio&page=${currentPage}`
-    ) // seed : semillas revisar doc de la api
-      .then((res) => {
-        console.log(res.ok, res.status, res.statusText);
-
-        if (!res.ok) throw new Error('error de la petición'); // validación correcta (cons axios no es necesario el catch getiona esta linea por debajo)
-        return res.json();
-      })
-      .then((data) => {
-        setUsers((prev) => {
-          console.log(prev);
-          const newUsers = prev.concat(data.results);
-          originalUsers.current = newUsers;
-          return newUsers;
-        });
-      })
-      .catch((error) => {
-        // aqui se valida si el fetch no responde por conección
-        setError(true);
-        setLoading(false);
-        console.log(error);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [currentPage]);
 
   const togglePaint = () => {
     setShowColors(!showColors);
@@ -58,7 +25,7 @@ function App() {
   const filteredUsers = useMemo(() => {
     return filterCountry !== null && filterCountry.length > 0
       ? users.filter((user) =>
-          user.location.country.toLowerCase().includes(filterCountry)
+          user.location.country.toLowerCase().includes(filterCountry.toLocaleLowerCase())
         )
       : users;
   }, [filterCountry, users]);
@@ -80,23 +47,25 @@ function App() {
     }
   }, [filteredUsers, sortedByCountry]);
 
-  const handleDelete = (mail: string) => {
-    const newUsers = users.filter((user) => user.email != mail);
-    setUsers(newUsers);
+  const handleDelete = (mail: string) => { // TODO //////////////////
+    // const newUsers= users.filter((user) => user.email != mail);
+    // setUsers(newUsers);
   };
 
-  const restoreAllUsers = () => {
-    setUsers(originalUsers.current);
-    setFilteCountry(null);
+  const restoreAllUsers = async () => {
+    // setUsers(originalUsers.current);
+    // setFilteCountry(null);
+    await refetch();
+    
   };
 
   const handleOrganisator = (data: SortBy) => {
-    setSortedByCountry(data);
+     setSortedByCountry(data);
   };
 
   return (
     <>
-      <h1>Prueba Tecnica</h1>
+      <h1>Prueba Técnica</h1>
       <UserActions
         togglePaint={togglePaint}
         sortByCountry={sortByCountry}
@@ -104,7 +73,6 @@ function App() {
         setFilteCountry={setFilteCountry}
         sortedByCountry={sortedByCountry}
       />
-
       {users.length > 0 && (
         <>
           <ListOfUsers
@@ -113,16 +81,16 @@ function App() {
             handleDelete={handleDelete}
             handleOrganisator={handleOrganisator}
           />
-          {!loading && (
-            <button onClick={() => setCurrentPage(currentPage + 1)}>
-              Charge more users
-            </button>
-          )}
+          {!isLoading &&
+            hasNextPage && ( // hasNextPage es un boooleano que es true si hay man paginas (si la linea 20 no es undefine)
+              <button onClick={() => fetchNextPage()}>Charge more users</button>
+            )}
         </>
       )}
-      {loading && <h3>Laoding...</h3>}
-      {!loading && error && <h3>the request has an error</h3>}
-      {!loading && !error && users.length === 0 && <h3>No users</h3>}
+      {isLoading && <h3>Laoding...</h3>}
+      {!isLoading && isError && <h3>the request has an error</h3>}
+      {!isLoading && !isError && users.length === 0 && <h3>No users</h3>}
+      {!isLoading && !hasNextPage && <h3>No more users</h3>}
     </>
   );
 }

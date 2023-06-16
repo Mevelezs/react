@@ -5,7 +5,7 @@ interface Props {
   sortByCountry: () => void;
   restoreAllUsers: () => void;
   setFilteCountry: React.Dispatch<React.SetStateAction<string | null>>;
-  sortedByCountry:SortBy
+  sortedByCountry: SortBy;
 }
 
 export function UserActions({
